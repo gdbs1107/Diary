@@ -55,7 +55,7 @@ public class MemberController {
         }
     }
 
-    // 회원 비밀번호 수정
+    // 회원 비밀번호 수정ㅎㅎㅎ
     @PutMapping("/{id}/password")
     public ResponseEntity<Member> updateMemberPassword(@PathVariable Long id, @RequestBody Member updatedMember) {
         try {
