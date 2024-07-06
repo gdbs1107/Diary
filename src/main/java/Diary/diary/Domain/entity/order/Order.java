@@ -4,9 +4,12 @@ import Diary.diary.Domain.entity.member.Delivery;
 import Diary.diary.Domain.entity.member.Member;
 import Diary.diary.Domain.entity.member.Pay;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "orders")
+@Getter@Setter
 public class Order {
 
     @Id

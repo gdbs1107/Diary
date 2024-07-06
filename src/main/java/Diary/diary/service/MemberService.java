@@ -19,15 +19,13 @@ public class MemberService {
 
 
     //회원정보 저장
-    public Long save(Member member){
-        if (!nameDuplicateValid(member.getName())){
-            Long memberId = save(member);
-            return memberId;
-        }else {
+    public Long save(Member member) {
+        if (!nameDuplicateValid(member.getName())) {
+            return memberRepository.save(member).getId();
+        } else {
             throw new IllegalArgumentException("사용중인 이름입니다");
         }
     }
-
 
     //전체 회원 조회
     public List<Member> getAllMembers() {
@@ -66,10 +64,8 @@ public class MemberService {
 
     // 이메일을 통해 비밀번호 조회
     public String getPasswordByEmail(String email) {
-        Member member = memberRepository.findByEmail(email);
-        if (member == null) {
-            throw new IllegalArgumentException("Member not found with email: " + email);
-        }
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found with email: " + email));
         return member.getPassword();
     }
 
@@ -92,6 +88,8 @@ public class MemberService {
         }
         return false;
     }
+
+
 
     // 회원이 존재하는지 검증하는 메서드
     public boolean isMemberExists(Long memberId) {
