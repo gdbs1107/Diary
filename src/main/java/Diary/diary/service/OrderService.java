@@ -1,5 +1,6 @@
 package Diary.diary.service;
 
+import Diary.diary.Domain.Dto.OrderDto;
 import Diary.diary.Domain.entity.member.Delivery;
 import Diary.diary.Domain.entity.member.Member;
 import Diary.diary.Domain.entity.member.Pay;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -23,54 +25,41 @@ public class OrderService {
     private final DeliveryRepository deliveryRepository;
     private final BookRepository bookRepository;
 
+    public OrderDto toDto(Order order) {
+        return new OrderDto(
+                order.getId(),
+                order.getBook().getId(),
+                order.getMember().getId(),
+                order.getDelivery().getId(),
+                order.getPay().getId()
+        );
+    }
+
+    public Order toEntity(OrderDto orderDto) {
+        Order order = new Order();
+        order.setId(orderDto.getId());
+        order.setBook(bookRepository.findById(orderDto.getBookId())
+                .orElseThrow(() -> new IllegalArgumentException("Book not found with ID: " + orderDto.getBookId())));
+        order.setMember(memberRepository.findById(orderDto.getMemberId())
+                .orElseThrow(() -> new IllegalArgumentException("Member not found with ID: " + orderDto.getMemberId())));
+        order.setDelivery(deliveryRepository.findById(orderDto.getDeliveryId())
+                .orElseThrow(() -> new IllegalArgumentException("Delivery not found with ID: " + orderDto.getDeliveryId())));
+        order.setPay(payRepository.findById(orderDto.getPayId())
+                .orElseThrow(() -> new IllegalArgumentException("Payment method not found with ID: " + orderDto.getPayId())));
+        return order;
+    }
+
     // CRUD operations
-    public Order createOrder(Order order) {
-        return orderRepository.save(order);
-    }
+    public OrderDto createOrder(OrderDto orderDto) {
+        Member member = memberRepository.findById(orderDto.getMemberId())
+                .orElseThrow(() -> new IllegalArgumentException("Member not found with ID: " + orderDto.getMemberId()));
+        Pay pay = payRepository.findById(orderDto.getPayId())
+                .orElseThrow(() -> new IllegalArgumentException("Payment method not found with ID: " + orderDto.getPayId()));
+        Delivery delivery = deliveryRepository.findById(orderDto.getDeliveryId())
+                .orElseThrow(() -> new IllegalArgumentException("Delivery address not found with ID: " + orderDto.getDeliveryId()));
+        Book book = bookRepository.findById(orderDto.getBookId())
+                .orElseThrow(() -> new IllegalArgumentException("Book not found with ID: " + orderDto.getBookId()));
 
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
-    }
-
-    public Order getOrderById(Long orderId) {
-        return orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
-    }
-
-    public Order updateOrder(Long orderId, Order updatedOrder) {
-        Order existingOrder = getOrderById(orderId);
-
-        existingOrder.setBook(updatedOrder.getBook());
-        existingOrder.setDelivery(updatedOrder.getDelivery());
-        existingOrder.setPay(updatedOrder.getPay());
-
-        return orderRepository.save(existingOrder);
-    }
-
-    public void deleteOrder(Long orderId) {
-        Order existingOrder = getOrderById(orderId);
-        orderRepository.delete(existingOrder);
-    }
-
-    // 주문 로직
-    public String placeOrder(Long memberId, Long bookId, Long payId, Long deliveryId, int amount) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found with ID: " + memberId));
-        Pay pay = payRepository.findById(payId)
-                .orElseThrow(() -> new IllegalArgumentException("Payment method not found with ID: " + payId));
-        Delivery delivery = deliveryRepository.findById(deliveryId)
-                .orElseThrow(() -> new IllegalArgumentException("Delivery address not found with ID: " + deliveryId));
-        Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new IllegalArgumentException("Book not found with ID: " + bookId));
-
-        // 제품 가격보다 결제수단의 돈이 많은지 검증
-        if (pay.getCardNumber() < amount) {
-            throw new IllegalArgumentException("Insufficient funds.");
-        }
-
-        // 돈을 빼서 내 계좌에 입금 (가상 계좌 번호 "1234")
-        int remainingAmount = pay.getCardNumber() - amount;
-        pay.setCardNumber(remainingAmount);
 
         // 주문 생성 및 저장
         Order order = new Order();
@@ -79,13 +68,50 @@ public class OrderService {
         order.setPay(pay);
         order.setDelivery(delivery);
 
-        orderRepository.save(order);
+        return toDto(orderRepository.save(order));
+    }
 
-        return "Payment completed. Remaining balance: " + remainingAmount;
+    public List<OrderDto> getAllOrders() {
+        return orderRepository.findAll().stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    public OrderDto getOrderById(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
+        return toDto(order);
+    }
+
+    public OrderDto updateOrder(Long orderId, OrderDto updatedOrderDto) {
+        Order existingOrder = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
+
+        existingOrder.setBook(bookRepository.findById(updatedOrderDto.getBookId())
+                .orElseThrow(() -> new IllegalArgumentException("Book not found with ID: " + updatedOrderDto.getBookId())));
+        existingOrder.setDelivery(deliveryRepository.findById(updatedOrderDto.getDeliveryId())
+                .orElseThrow(() -> new IllegalArgumentException("Delivery not found with ID: " + updatedOrderDto.getDeliveryId())));
+        existingOrder.setPay(payRepository.findById(updatedOrderDto.getPayId())
+                .orElseThrow(() -> new IllegalArgumentException("Payment method not found with ID: " + updatedOrderDto.getPayId())));
+
+        return toDto(orderRepository.save(existingOrder));
+    }
+
+    public void deleteOrder(Long orderId) {
+        Order existingOrder = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
+        orderRepository.delete(existingOrder);
     }
 
     // 자신이 가진 결제수단 조회
     public List<Pay> getPaymentMethods(Long memberId) {
         return payRepository.findAllByMemberId(memberId);
+    }
+
+    // 특정 회원의 모든 주문 정보 조회
+    public List<OrderDto> getAllOrdersByMember(Long memberId) {
+        return orderRepository.findAllByMemberId(memberId).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 }

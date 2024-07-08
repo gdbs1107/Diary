@@ -1,6 +1,7 @@
 package Diary.diary.Domain.entity.member;
 
 import Diary.diary.Domain.entity.order.Order;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +18,7 @@ public class Pay {
     private int cardNumber;
 
     @OneToOne(mappedBy = "pay",fetch = FetchType.LAZY)
+    @JsonIgnore
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)

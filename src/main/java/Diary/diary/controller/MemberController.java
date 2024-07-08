@@ -1,7 +1,9 @@
 package Diary.diary.controller;
 
+import Diary.diary.Domain.Dto.MemberDto;
 import Diary.diary.Domain.entity.member.Member;
 import Diary.diary.service.MemberService;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +19,9 @@ public class MemberController {
 
     // 회원 정보 저장
     @PostMapping
-    public ResponseEntity<Long> createMember(@RequestBody Member member) {
+    public ResponseEntity<Long> createMember(@RequestBody MemberDto memberDto) {
         try {
-            Long memberId = memberService.save(member);
+            Long memberId = memberService.save(memberDto);
             return ResponseEntity.ok(memberId);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
@@ -28,17 +30,17 @@ public class MemberController {
 
     // 전체 회원 조회
     @GetMapping
-    public ResponseEntity<List<Member>> getAllMembers() {
-        List<Member> members = memberService.getAllMembers();
+    public ResponseEntity<List<MemberDto>> getAllMembers() {
+        List<MemberDto> members = memberService.getAllMembers();
         return ResponseEntity.ok(members);
     }
 
     // 단일 회원 조회
     @GetMapping("/{id}")
-    public ResponseEntity<Member> getMemberById(@PathVariable Long id) {
+    public ResponseEntity<MemberDto> getMemberById(@PathVariable Long id) {
         try {
-            Member member = memberService.getMemberById(id);
-            return ResponseEntity.ok(member);
+            MemberDto memberDto = memberService.getMemberById(id);
+            return ResponseEntity.ok(memberDto);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
@@ -46,10 +48,10 @@ public class MemberController {
 
     // 회원 정보 수정
     @PutMapping("/{id}")
-    public ResponseEntity<Member> updateMember(@PathVariable Long id, @RequestBody Member updatedMember) {
+    public ResponseEntity<MemberDto> updateMember(@PathVariable Long id, @RequestBody MemberDto updatedMemberDto) {
         try {
-            Member member = memberService.updateMember(id, updatedMember);
-            return ResponseEntity.ok(member);
+            MemberDto memberDto = memberService.updateMember(id, updatedMemberDto);
+            return ResponseEntity.ok(memberDto);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
@@ -57,10 +59,10 @@ public class MemberController {
 
     // 회원 비밀번호 수정
     @PutMapping("/{id}/password")
-    public ResponseEntity<Member> updateMemberPassword(@PathVariable Long id, @RequestBody Member updatedMember) {
+    public ResponseEntity<MemberDto> updateMemberPassword(@PathVariable Long id, @RequestBody String newPassword) {
         try {
-            Member member = memberService.updateMemberPassword(id, updatedMember);
-            return ResponseEntity.ok(member);
+            MemberDto memberDto = memberService.updateMemberPassword(id, newPassword);
+            return ResponseEntity.ok(memberDto);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }

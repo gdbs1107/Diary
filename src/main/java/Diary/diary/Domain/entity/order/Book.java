@@ -8,6 +8,8 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
+
+//Book 수정하자
 @Entity
 @Getter@Setter
 public class Book {
@@ -21,7 +23,7 @@ public class Book {
 
     private int price;
 
-    @OneToMany(mappedBy = "book")
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
     private List<Diary> contents = new ArrayList<>();
 
     @OneToOne(mappedBy = "book",fetch = FetchType.LAZY)

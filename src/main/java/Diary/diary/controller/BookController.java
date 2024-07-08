@@ -1,5 +1,6 @@
 package Diary.diary.controller;
 
+import Diary.diary.Domain.Dto.BookDto;
 import Diary.diary.Domain.entity.order.Book;
 import Diary.diary.service.BookService;
 import lombok.RequiredArgsConstructor;
@@ -16,17 +17,16 @@ public class BookController {
 
     // 책 생성
     @PostMapping
-    public ResponseEntity<Book> createBook(@RequestBody Book book) {
-        Book createdBook = bookService.createBook(book);
+    public ResponseEntity<BookDto> createBook(@RequestBody BookDto bookDto) {
+        BookDto createdBook = bookService.createBook(bookDto);
         return ResponseEntity.ok(createdBook);
     }
 
-
     // 책 조회
     @GetMapping("/{id}")
-    public ResponseEntity<Book> getBookById(@PathVariable Long id) {
+    public ResponseEntity<BookDto> getBookById(@PathVariable Long id) {
         try {
-            Book book = bookService.getBookById(id);
+            BookDto book = bookService.getBookById(id);
             return ResponseEntity.ok(book);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
@@ -35,9 +35,9 @@ public class BookController {
 
     // 책 수정
     @PutMapping("/{id}")
-    public ResponseEntity<Book> updateBook(@PathVariable Long id, @RequestBody Book updatedBook) {
+    public ResponseEntity<BookDto> updateBook(@PathVariable Long id, @RequestBody BookDto updatedBookDto) {
         try {
-            Book book = bookService.updateBook(id, updatedBook);
+            BookDto book = bookService.updateBook(id, updatedBookDto);
             return ResponseEntity.ok(book);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
