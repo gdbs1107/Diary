@@ -18,7 +18,6 @@ public class Pay {
     private int cardNumber;
 
     @OneToOne(mappedBy = "pay",fetch = FetchType.LAZY)
-    @JsonIgnore
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)

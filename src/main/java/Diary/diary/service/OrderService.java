@@ -1,6 +1,7 @@
 package Diary.diary.service;
 
 import Diary.diary.Domain.Dto.OrderDto;
+import Diary.diary.Domain.Dto.responseDto.OrderResponseDto;
 import Diary.diary.Domain.entity.member.Delivery;
 import Diary.diary.Domain.entity.member.Member;
 import Diary.diary.Domain.entity.member.Pay;
@@ -26,31 +27,42 @@ public class OrderService {
     private final BookRepository bookRepository;
 
     public OrderDto toDto(Order order) {
-        return new OrderDto(
-                order.getId(),
-                order.getBook().getId(),
-                order.getMember().getId(),
-                order.getDelivery().getId(),
-                order.getPay().getId()
-        );
+        return OrderDto.builder()
+                .id(order.getId())
+                .bookId(order.getBook().getId())
+                .memberId(order.getMember().getId())
+                .deliveryId(order.getDelivery().getId())
+                .payId(order.getPay().getId())
+                .build();
+    }
+
+    public OrderResponseDto toResponseDto(Order order) {
+        return OrderResponseDto.builder()
+                .id(order.getId())
+                .book(OrderResponseDto.BookDto.builder()
+                        .id(order.getBook().getId())
+                        .bookName(order.getBook().getBookName())
+                        .price(order.getBook().getPrice())
+                        .build())
+                .member(OrderResponseDto.MemberDto.builder()
+                        .id(order.getMember().getId())
+                        .name(order.getMember().getUsername())
+                        .email(order.getMember().getEmail())
+                        .build())
+                .delivery(OrderResponseDto.DeliveryDto.builder()
+                        .id(order.getDelivery().getId())
+                        .street(order.getDelivery().getStreet())
+                        .zipcode(order.getDelivery().getZipcode())
+                        .number(order.getDelivery().getNumber())
+                        .build())
+                .pay(OrderResponseDto.PayDto.builder()
+                        .id(order.getPay().getId())
+                        .cardNumber(order.getPay().getCardNumber())
+                        .build())
+                .build();
     }
 
     public Order toEntity(OrderDto orderDto) {
-        Order order = new Order();
-        order.setId(orderDto.getId());
-        order.setBook(bookRepository.findById(orderDto.getBookId())
-                .orElseThrow(() -> new IllegalArgumentException("Book not found with ID: " + orderDto.getBookId())));
-        order.setMember(memberRepository.findById(orderDto.getMemberId())
-                .orElseThrow(() -> new IllegalArgumentException("Member not found with ID: " + orderDto.getMemberId())));
-        order.setDelivery(deliveryRepository.findById(orderDto.getDeliveryId())
-                .orElseThrow(() -> new IllegalArgumentException("Delivery not found with ID: " + orderDto.getDeliveryId())));
-        order.setPay(payRepository.findById(orderDto.getPayId())
-                .orElseThrow(() -> new IllegalArgumentException("Payment method not found with ID: " + orderDto.getPayId())));
-        return order;
-    }
-
-    // CRUD operations
-    public OrderDto createOrder(OrderDto orderDto) {
         Member member = memberRepository.findById(orderDto.getMemberId())
                 .orElseThrow(() -> new IllegalArgumentException("Member not found with ID: " + orderDto.getMemberId()));
         Pay pay = payRepository.findById(orderDto.getPayId())
@@ -60,27 +72,33 @@ public class OrderService {
         Book book = bookRepository.findById(orderDto.getBookId())
                 .orElseThrow(() -> new IllegalArgumentException("Book not found with ID: " + orderDto.getBookId()));
 
-
-        // 주문 생성 및 저장
         Order order = new Order();
-        order.setBook(book);
+        order.setId(orderDto.getId());
         order.setMember(member);
         order.setPay(pay);
         order.setDelivery(delivery);
+        order.setBook(book);
 
+        return order;
+    }
+
+
+    // CRUD operations
+    public OrderDto createOrder(OrderDto orderDto) {
+        Order order = toEntity(orderDto);
         return toDto(orderRepository.save(order));
     }
 
-    public List<OrderDto> getAllOrders() {
+    public List<OrderResponseDto> getAllOrders() {
         return orderRepository.findAll().stream()
-                .map(this::toDto)
+                .map(this::toResponseDto)
                 .collect(Collectors.toList());
     }
 
-    public OrderDto getOrderById(Long orderId) {
+    public OrderResponseDto getOrderById(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
-        return toDto(order);
+        return toResponseDto(order);
     }
 
     public OrderDto updateOrder(Long orderId, OrderDto updatedOrderDto) {
@@ -109,9 +127,9 @@ public class OrderService {
     }
 
     // 특정 회원의 모든 주문 정보 조회
-    public List<OrderDto> getAllOrdersByMember(Long memberId) {
+    public List<OrderResponseDto> getAllOrdersByMember(Long memberId) {
         return orderRepository.findAllByMemberId(memberId).stream()
-                .map(this::toDto)
+                .map(this::toResponseDto)
                 .collect(Collectors.toList());
     }
 }

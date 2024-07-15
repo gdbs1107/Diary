@@ -23,13 +23,19 @@ public class MemberService {
     private final BookRepository bookRepository;
 
     public MemberDto toDto(Member member) {
-        return new MemberDto(member.getId(), member.getName(), member.getEmail(), member.getBirthDate(), member.getPassword());
+        return MemberDto.builder()
+                .id(member.getId())
+                .name(member.getUsername())
+                .email(member.getEmail())
+                .birthDate(member.getBirthDate())
+                .password(member.getPassword())
+                .build();
     }
 
     public Member toEntity(MemberDto memberDto) {
         Member member = new Member();
         member.setId(memberDto.getId());
-        member.setName(memberDto.getName());
+        member.setUsername(memberDto.getName());
         member.setEmail(memberDto.getEmail());
         member.setBirthDate(memberDto.getBirthDate());
         member.setPassword(memberDto.getPassword());
@@ -37,10 +43,9 @@ public class MemberService {
     }
 
     // 회원정보 저장
-    // 회원정보 저장
     public Long save(MemberDto memberDto) {
         Member member = toEntity(memberDto);
-        if (!nameDuplicateValid(member.getName())) {
+        if (!nameDuplicateValid(member.getUsername())) {
             member = memberRepository.save(member);
             assignBookToMember(member); // 책 할당 로직 추가
             return member.getId();
@@ -68,11 +73,10 @@ public class MemberService {
         Member existingMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("회원정보를 찾을 수 없습니다"));
 
-        existingMember.setName(updatedMemberDto.getName());
+        existingMember.setUsername(updatedMemberDto.getName());
         existingMember.setBirthDate(updatedMemberDto.getBirthDate());
         existingMember.setEmail(updatedMemberDto.getEmail());
         existingMember.setPassword(updatedMemberDto.getPassword());
-        // 필요한 경우 다른 필드도 추가로 업데이트
 
         return toDto(memberRepository.save(existingMember));
     }
@@ -95,13 +99,8 @@ public class MemberService {
 
     // 이름 중복확인 메서드
     public boolean nameDuplicateValid(String name) {
-        List<Member> members = memberRepository.findAll();
-        for (Member member : members) {
-            if (member.getName().equals(name)) {
-                return true;
-            }
-        }
-        return false;
+        return memberRepository.findAll().stream()
+                .anyMatch(member -> member.getUsername().equals(name));
     }
 
     // 회원이 존재하는지 검증하는 메서드

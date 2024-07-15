@@ -23,7 +23,11 @@ public class BookService {
         List<Long> diaryIds = book.getContents().stream()
                 .map(diary -> diary.getId())
                 .collect(Collectors.toList());
-        return new BookDto(book.getId(), book.getBookName(), book.getPrice());
+        return BookDto.builder()
+                .id(book.getId())
+                .bookName(book.getBookName())
+                .price(book.getPrice())
+                .build();
     }
 
     public Book toEntity(BookDto bookDto) {

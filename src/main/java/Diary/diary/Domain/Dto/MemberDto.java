@@ -1,11 +1,12 @@
 package Diary.diary.Domain.Dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
 
-@Getter@Setter
+@Getter
 public class MemberDto {
     private Long id;
     private String name;
@@ -17,6 +18,7 @@ public class MemberDto {
     public MemberDto() {
     }
 
+    @Builder
     public MemberDto(Long id, String name, String email, Date birthDate, String password) {
         this.id = id;
         this.name = name;

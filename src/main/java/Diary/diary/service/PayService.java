@@ -20,18 +20,19 @@ public class PayService {
     private final MemberRepository memberRepository;
 
     public PayDto toDto(Pay pay) {
-        return new PayDto(
-                pay.getId(),
-                pay.getCardNumber()
-        );
+        return PayDto.builder()
+                .id(pay.getId())
+                .cardNumber(pay.getCardNumber())
+                .build();
     }
 
     public Pay toEntity(PayDto payDto, Long memberId) {
         Pay pay = new Pay();
         pay.setId(payDto.getId());
         pay.setCardNumber(payDto.getCardNumber());
-        pay.setMember(memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다.")));
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+        pay.setMember(member);
         return pay;
     }
 

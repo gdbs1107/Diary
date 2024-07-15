@@ -28,4 +28,11 @@ public class Book {
 
     @OneToOne(mappedBy = "book",fetch = FetchType.LAZY)
     private Order order;
+
+    // 가격 계산 메서드
+    public void calculatePrice() {
+        int diaryCount = this.contents.size();
+        this.price = diaryCount * 10000; // 다이어리 한 장당 가격을 만원으로 설정
+    }
+
 }

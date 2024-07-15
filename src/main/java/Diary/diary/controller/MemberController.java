@@ -1,9 +1,7 @@
 package Diary.diary.controller;
 
 import Diary.diary.Domain.Dto.MemberDto;
-import Diary.diary.Domain.entity.member.Member;
 import Diary.diary.service.MemberService;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

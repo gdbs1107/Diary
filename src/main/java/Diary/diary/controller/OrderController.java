@@ -1,6 +1,7 @@
 package Diary.diary.controller;
 
 import Diary.diary.Domain.Dto.OrderDto;
+import Diary.diary.Domain.Dto.responseDto.OrderResponseDto;
 import Diary.diary.Domain.entity.member.Pay;
 import Diary.diary.Domain.entity.order.Order;
 import Diary.diary.service.OrderService;
@@ -19,15 +20,15 @@ public class OrderController {
 
     // 모든 주문 조회
     @GetMapping
-    public ResponseEntity<List<OrderDto>> getAllOrders() {
-        List<OrderDto> orders = orderService.getAllOrders();
+    public ResponseEntity<List<OrderResponseDto>> getAllOrders() {
+        List<OrderResponseDto> orders = orderService.getAllOrders();
         return ResponseEntity.ok(orders);
     }
 
     // 특정 주문 조회
     @GetMapping("/{orderId}")
-    public ResponseEntity<OrderDto> getOrderById(@PathVariable Long orderId) {
-        OrderDto order = orderService.getOrderById(orderId);
+    public ResponseEntity<OrderResponseDto> getOrderById(@PathVariable Long orderId) {
+        OrderResponseDto order = orderService.getOrderById(orderId);
         return ResponseEntity.ok(order);
     }
 
@@ -59,9 +60,10 @@ public class OrderController {
         return ResponseEntity.ok(payments);
     }
 
+    // 특정 회원의 모든 주문 정보 조회
     @GetMapping("/member/{memberId}")
-    public ResponseEntity<List<OrderDto>> getAllOrdersByMember(@PathVariable Long memberId) {
-        List<OrderDto> orders = orderService.getAllOrdersByMember(memberId);
+    public ResponseEntity<List<OrderResponseDto>> getAllOrdersByMember(@PathVariable Long memberId) {
+        List<OrderResponseDto> orders = orderService.getAllOrdersByMember(memberId);
         return ResponseEntity.ok(orders);
     }
 }

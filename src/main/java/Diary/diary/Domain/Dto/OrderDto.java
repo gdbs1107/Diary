@@ -1,9 +1,10 @@
 package Diary.diary.Domain.Dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter @Setter
+@Getter
 public class OrderDto {
     private Long id;
     private Long bookId;
@@ -16,6 +17,7 @@ public class OrderDto {
     }
 
     // Parameterized constructor
+    @Builder
     public OrderDto(Long id, Long bookId, Long memberId, Long deliveryId, Long payId) {
         this.id = id;
         this.bookId = bookId;

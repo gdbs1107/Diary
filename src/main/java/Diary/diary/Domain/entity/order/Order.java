@@ -4,12 +4,13 @@ import Diary.diary.Domain.entity.member.Delivery;
 import Diary.diary.Domain.entity.member.Member;
 import Diary.diary.Domain.entity.member.Pay;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Table(name = "orders")
-@Getter@Setter
+@Getter @Setter
 public class Order {
 
     @Id
@@ -32,4 +33,8 @@ public class Order {
     @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @JoinColumn(name = "pay_id")
     private Pay pay;
+
+    public Order() {
+    }
+
 }

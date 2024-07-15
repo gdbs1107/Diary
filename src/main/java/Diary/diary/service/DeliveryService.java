@@ -21,12 +21,12 @@ public class DeliveryService {
     private final MemberRepository memberRepository;
 
     public DeliveryDto toDto(Delivery delivery) {
-        return new DeliveryDto(
-                delivery.getId(),
-                delivery.getStreet(),
-                delivery.getZipcode(),
-                delivery.getNumber()
-        );
+        return DeliveryDto.builder()
+                .id(delivery.getId())
+                .street(delivery.getStreet())
+                .zipcode(delivery.getZipcode())
+                .number(delivery.getNumber())
+                .build();
     }
 
     public Delivery toEntity(DeliveryDto deliveryDto, Long memberId) {

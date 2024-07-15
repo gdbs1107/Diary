@@ -21,16 +21,16 @@ public class DiaryService {
 
     private final DiaryRepository diaryRepository;
     private final MemberRepository memberRepository;
-    private final BookRepository bookRepository; // BookRepository 추가
+    private final BookRepository bookRepository;
 
     public DiaryDto toDto(Diary diary) {
-        return new DiaryDto(
-                diary.getId(),
-                diary.getDiaryDate(),
-                diary.getContent(),
-                diary.getWeather(),
-                diary.getTitle()
-        );
+        return DiaryDto.builder()
+                .id(diary.getId())
+                .diaryDate(diary.getDiaryDate())
+                .content(diary.getContent())
+                .weather(diary.getWeather())
+                .title(diary.getTitle())
+                .build();
     }
 
     public Diary toEntity(DiaryDto diaryDto) {
@@ -45,7 +45,7 @@ public class DiaryService {
 
     // 일기 작성
     public DiaryDto createDiary(Long memberId, Long bookId, DiaryDto diaryDto) {
-        validate(diaryDto.getContent().length() <= 255, "일기는 255자까지 작성 할 수 있습니다.");
+        validate(diaryDto.getContent().length() <= 255, "일기는 255자까지 작성할 수 있습니다.");
         validate(!diaryDto.getDiaryDate().isAfter(LocalDateTime.now()), "날짜를 다시 선택해주세요.");
 
         Member member = getMemberById(memberId);
@@ -75,13 +75,12 @@ public class DiaryService {
         validate(member.getPassword().equals(password), "비밀번호가 일치하지 않습니다.");
 
         Diary existingDiary = getDiaryById(diaryId);
-        validate(existingDiary.getMember().getId().equals(memberId), "Diary does not belong to the member.");
+        validate(existingDiary.getMember().getId().equals(memberId), "일기가 회원에 속하지 않습니다.");
 
         existingDiary.setTitle(updatedDiaryDto.getTitle());
         existingDiary.setContent(updatedDiaryDto.getContent());
         existingDiary.setDiaryDate(updatedDiaryDto.getDiaryDate());
         existingDiary.setWeather(updatedDiaryDto.getWeather());
-        // 필요한 경우 다른 필드도 추가로 업데이트
 
         return toDto(diaryRepository.save(existingDiary));
     }
@@ -92,7 +91,7 @@ public class DiaryService {
         validate(member.getPassword().equals(password), "비밀번호가 일치하지 않습니다.");
 
         Diary existingDiary = getDiaryById(diaryId);
-        validate(existingDiary.getMember().getId().equals(memberId), "Diary does not belong to the member.");
+        validate(existingDiary.getMember().getId().equals(memberId), "일기가 회원에 속하지 않습니다.");
 
         diaryRepository.delete(existingDiary);
     }
@@ -100,7 +99,7 @@ public class DiaryService {
     // 회원 조회 메서드
     private Member getMemberById(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("회원정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
     }
 
     // 일기 조회 메서드
