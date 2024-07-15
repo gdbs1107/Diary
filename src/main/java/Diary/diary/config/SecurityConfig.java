@@ -53,7 +53,7 @@ public class SecurityConfig {
         http.httpBasic((auth)->auth.disable());
 
         http.authorizeHttpRequests((auth)->auth
-                .requestMatchers("/login","/","/join").permitAll()
+                .requestMatchers("/login","/","/members","/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers("/admin").hasRole("ADMIN")
                 .anyRequest().authenticated());
 

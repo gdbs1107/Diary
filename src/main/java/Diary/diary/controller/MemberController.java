@@ -2,6 +2,7 @@ package Diary.diary.controller;
 
 import Diary.diary.Domain.Dto.MemberDto;
 import Diary.diary.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class MemberController {
 
     // 회원 정보 저장
     @PostMapping
-    public ResponseEntity<Long> createMember(@RequestBody MemberDto memberDto) {
+    public ResponseEntity<Long> createMember(@RequestBody @Valid MemberDto memberDto) {
         try {
             Long memberId = memberService.save(memberDto);
             return ResponseEntity.ok(memberId);

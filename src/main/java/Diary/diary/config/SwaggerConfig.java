@@ -1,4 +1,4 @@
-package Diary.diary.swagger;
+package Diary.diary.config;
 
 import org.springdoc.core.models.GroupedOpenApi;
 import io.swagger.v3.oas.models.OpenAPI;
